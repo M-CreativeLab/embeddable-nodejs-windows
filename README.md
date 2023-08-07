@@ -1,5 +1,7 @@
 # Node.js
 
+> The Windows Build for Node.js shared library.
+
 Node.js is an open-source, cross-platform, JavaScript runtime environment.
 
 For information on using Node.js, see the [Node.js website][].
