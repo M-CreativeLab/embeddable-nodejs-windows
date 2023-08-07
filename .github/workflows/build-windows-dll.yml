@@ -1,0 +1,45 @@
+name: Build Windows DLL
+
+on:
+  push:
+    branches: [ "build-v16.17.1" ]
+
+env:
+  PYTHON_VERSION: '3.10'
+  FLAKY_TESTS: keep_retrying
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    strategy:
+      matrix:
+        windows: [windows-2019]
+      fail-fast: false
+    runs-on: ${{ matrix.windows }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+      - name: Upload Artifact(Test)
+        uses: actions/upload-artifact@v2
+        with:
+          name: nodejs-source-artifacts
+          path: src
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Build
+        run: ./vcbuild.bat release dll nonpm nocorepack without-intl openssl-no-asm
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: nodejs-windows-artifacts
+          path: |
+            out/Release
+            !out/Release/lib
+            !out/Release/obj
+      - name: Run tests
+        run: ./out/Release/node.exe -v
